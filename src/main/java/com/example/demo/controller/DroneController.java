@@ -60,7 +60,7 @@ public class DroneController {
      */
     @GetMapping("/getBatteryPercentage/{serialNo}")
     public ResponseEntity<Response> getDroneBatteryPercentage(@PathVariable("serialNo") String serialNo){
-        return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(), this.droneService.getDroneBatteryPercentage(serialNo),null));
+        return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(), "successfully got data", this.droneService.getDroneBatteryPercentage(serialNo)));
     }
 
     /**
