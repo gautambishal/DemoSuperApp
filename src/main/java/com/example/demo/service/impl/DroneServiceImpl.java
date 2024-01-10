@@ -1,24 +1,25 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.DroneException;
-import com.example.demo.models.Drone;
-import com.example.demo.models.DroneMedications;
-import com.example.demo.models.Medication;
-import com.example.demo.models.State;
+import com.example.demo.models.*;
+import com.example.demo.repo.DroneBatteryLogsRepositroy;
 import com.example.demo.repo.DroneMedicationsRepository;
 import com.example.demo.repo.DroneRepository;
 import com.example.demo.repo.MedicationRepository;
 import com.example.demo.service.DroneService;
 import com.example.demo.service.FileService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.FileSystems;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 
 @Service
+@Slf4j
 public class DroneServiceImpl implements DroneService {
 
     private static final String UPLOAD_LOCATION = "uploads";
@@ -26,13 +27,15 @@ public class DroneServiceImpl implements DroneService {
     private final DroneRepository droneRepository;
     private final FileService fileService;
     private final MedicationRepository medicationRepository;
+    private final DroneBatteryLogsRepositroy droneBatteryLogsRepositroy;
 
     private final DroneMedicationsRepository droneMedicationsRepository;
 
-    public DroneServiceImpl(DroneRepository droneRepository, FileService fileService, MedicationRepository medicationRepository, DroneMedicationsRepository droneMedicationsRepository) {
+    public DroneServiceImpl(DroneRepository droneRepository, FileService fileService, MedicationRepository medicationRepository, DroneBatteryLogsRepositroy droneBatteryLogsRepositroy, DroneMedicationsRepository droneMedicationsRepository) {
         this.droneRepository = droneRepository;
         this.fileService = fileService;
         this.medicationRepository = medicationRepository;
+        this.droneBatteryLogsRepositroy = droneBatteryLogsRepositroy;
         this.droneMedicationsRepository = droneMedicationsRepository;
     }
 
@@ -60,8 +63,24 @@ public class DroneServiceImpl implements DroneService {
 
     @Override
     public List<Drone> getAvailableDrones() {
-//        return this.droneRepository.findById();
         return this.droneRepository.getAllByState(State.IDLE);
+    }
+
+    @Override
+    public void checkForDroneBatteryPercentAndLog() {
+        List<Drone> droneList = this.droneRepository.findAll();
+        if(!droneList.isEmpty()) {
+            droneList.parallelStream().forEach(drone -> {
+                int batteryPercentage = drone.getBatteryPercentage();
+                DroneBatteryLogs droneBatteryLogs = DroneBatteryLogs.builder()
+                        .batteryPercentage(batteryPercentage)
+                        .timestamp(new Date())
+                        .serialNumber(drone.getSerialNumber())
+                        .build();
+                this.droneBatteryLogsRepositroy.save(droneBatteryLogs);
+                log.info("Updated for {} at timestamp {}",droneBatteryLogs.getSerialNumber(),droneBatteryLogs.getTimestamp());
+            });
+        }
     }
 
     private synchronized void uploadAndLoadMedicationFiles(Medication medication,Drone drone) {

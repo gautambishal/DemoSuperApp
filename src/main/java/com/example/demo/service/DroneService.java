@@ -13,4 +13,6 @@ public interface DroneService {
     String getDroneBatteryPercentage(String serialNo);
 
     List<Drone> getAvailableDrones();
+
+    void checkForDroneBatteryPercentAndLog();
 }

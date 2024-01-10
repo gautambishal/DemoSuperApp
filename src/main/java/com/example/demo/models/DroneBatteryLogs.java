@@ -1,6 +1,7 @@
 package com.example.demo.models;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Data
 @Entity
+@Builder
 public class DroneBatteryLogs {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
