@@ -9,4 +9,8 @@ public interface DroneService {
     String registerDrone(Drone drone);
 
     String loadDrone(String serialNumber, List<Medication> medication);
+
+    String getDroneBatteryPercentage(String serialNo);
+
+    List<Drone> getAvailableDrones();
 }

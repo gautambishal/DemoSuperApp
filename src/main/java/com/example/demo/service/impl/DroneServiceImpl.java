@@ -53,6 +53,17 @@ public class DroneServiceImpl implements DroneService {
         return "successfully loaded";
     }
 
+    @Override
+    public String getDroneBatteryPercentage(String serialNo) {
+        return this.droneRepository.getDroneBySerialNumber(serialNo).getBatteryPercentage().toString();
+    }
+
+    @Override
+    public List<Drone> getAvailableDrones() {
+//        return this.droneRepository.findById();
+        return this.droneRepository.getAllByState(State.IDLE);
+    }
+
     private synchronized void uploadAndLoadMedicationFiles(Medication medication,Drone drone) {
         String path = medication.getPath();
         byte[] uploadFile = this.base64ToMultipartFile(path);

@@ -40,7 +40,7 @@ public class DroneController {
      */
     @PostMapping("/registerDrone")
     public ResponseEntity<Response> registerDrone(@Valid @RequestBody Drone drone) {
-        return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(),this.droneService.registerDrone(drone)));
+        return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(),this.droneService.registerDrone(drone),null));
     }
 
     /**
@@ -52,8 +52,26 @@ public class DroneController {
 
             List<Medication> meds = this.objectMapper.readValue(medication, new TypeReference<List<Medication>>() {});
             validateMedicationPayload(meds);
-            return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(),this.droneService.loadDrone(serialNumber,meds)));
+            return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(),this.droneService.loadDrone(serialNumber,meds),null));
     }
+
+    /**
+     * check drone battery level for a given drone;
+     */
+    @GetMapping("/getBatteryPercentage/{serialNo}")
+    public ResponseEntity<Response> getDroneBatteryPercentage(@PathVariable("serialNo") String serialNo){
+        return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(), this.droneService.getDroneBatteryPercentage(serialNo),null));
+    }
+
+    /**
+     * get available drones
+     * @return
+     */
+    @GetMapping("/getAvailableDrones")
+    public ResponseEntity<Response> getAvailableDrones(){
+        return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(), "data successfully fetched",this.droneService.getAvailableDrones()));
+    }
+
 
     private void validateMedicationPayload(List<Medication> meds) throws MethodArgumentNotValidException {
         for (Medication med : meds) {
