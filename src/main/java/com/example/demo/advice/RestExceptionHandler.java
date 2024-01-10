@@ -1,7 +1,7 @@
 package com.example.demo.advice;
 
-import com.example.demo.exception.DroneException;
 import com.example.demo.dto.ErrorCode;
+import com.example.demo.exception.DroneException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,6 +27,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorCode> handleValidationException(Exception ex) {
+        ex.printStackTrace();
         return ResponseEntity.badRequest().body(new ErrorCode(new Date(),HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage()));
     }
 }

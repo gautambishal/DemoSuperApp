@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.Response;
-import com.example.demo.dto.ValidationResult;
 import com.example.demo.models.Drone;
 import com.example.demo.models.Medication;
 import com.example.demo.service.DroneService;
@@ -11,13 +10,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import javax.xml.bind.ValidationException;
 import java.util.List;
 
 @RestController
@@ -50,14 +46,13 @@ public class DroneController {
     /**
      * loading a drone with medication items.
      */
-    @PostMapping(value = "/loadMedication/{serialNo}",consumes = "multipart/form-data")
+    @PostMapping(value = "/loadMedication/{serialNo}")
     public ResponseEntity<Response> loadingDrone(@PathVariable("serialNo") String serialNumber,
                                                  @RequestParam("medication") String medication) throws MethodArgumentNotValidException, JsonProcessingException {
 
             List<Medication> meds = this.objectMapper.readValue(medication, new TypeReference<List<Medication>>() {});
             validateMedicationPayload(meds);
             return ResponseEntity.ok().body(new Response(HttpStatus.OK.value(),this.droneService.loadDrone(serialNumber,meds)));
-
     }
 
     private void validateMedicationPayload(List<Medication> meds) throws MethodArgumentNotValidException {
